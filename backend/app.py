@@ -1,11 +1,14 @@
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from flask_migrate import Migrate
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///farmcare.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.secret_key = b'Z;\xe1\xddM\x0b\xd2$T\r\xbc\x0c\xea\xeaoT\x9a-\xef\x7fh\xd5\xc4:'
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
@@ -43,6 +46,19 @@ pharmacy_medications = db.Table('pharmacy_medications',
     db.Column('medication_id', db.Integer, db.ForeignKey('medication.id'))
 )
 
+# User Model
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db,String(50), unique=True, nullable=False)
+    password_hash = db.Column(db.String(128), nullable=False)
+    role = db.Column(db>String(50), nullable=False)
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
 # API Endpoints
 @app.route('/', methods=['GET'])
 def index():
@@ -65,6 +81,53 @@ def add_medication():
 def get_pharmacies():
     pharmacies = Pharmacy.query.all()
     return pharmacies_schema.jsonify(pharmacies)
+word):
+    self.password_hash = generate_password_hash(password)
+
+def check_password(self, password):
+    return check_password_hash(self.password_hash, password)
+# API Endpoints
+@app.route('/register', methods=['POST'])
+def register():
+    username = request.json.get('username')
+    password = request.json.get('password')
+    role = request.json.get('role')
+
+    if User.query.filter_by(username=username).first():
+        return jsonify({'message': 'Username already exists'}), 400
+
+    new_user = User(username=username, role=role)
+    new_user.set_password(password)
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({'message': 'User registered successfully'})
+
+@app.route('/login', methods=['POST'])
+def login():
+    username = request.json.get('username')
+    password = request.json.get('password')
+
+    user = User.query.filter_by(username=username).first()
+
+    if not user or not user.check_password(password):
+        return jsonify({'message': 'Invalid username or password'}), 401
+
+    session['user_id'] = user.id
+    return jsonify({'message': 'Login successful'})
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.pop('user_id', None)
+    return jsonify({'message': 'Logout successful'})
+
+@app.route('/a[i/search', methods=['GET'])
+def search_pharmacies():
+    if 'user_id' not in session:
+        return jsonify({'message': 'Unauthorized'}), 401
+
+    user_location = request.args.get('location')
+    desired_medication = request.args.get('medication')
 
 @app.route('/api/pharmacies', methods=['POST'])
 def add_pharmacy():
