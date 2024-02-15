@@ -48,9 +48,9 @@ pharmacy_medications = db.Table('pharmacy_medications',
 # User Model
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db,String(50), unique=True, nullable=False)
+    username = db.Column(db.String(50), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
-    role = db.Column(db>String(50), nullable=False)
+    role = db.Column(db.String(50), nullable=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -68,7 +68,7 @@ def get_medications():
     medications = Medication.query.all()
     return medications_schema.jsonify(medications)
 
-@app.route('/api/meications', methods=['POST'])
+@app.route('/api/medications', methods=['POST'])
 def add_medication():
     name = request.json['name']
     new_medication = Medication(name=name)
@@ -79,7 +79,7 @@ def add_medication():
 @app.route('/api/pharmacies', methods=['GET'])
 def get_pharmacies():
     pharmacies = Pharmacy.query.all()
-    return pharmacies_scheme.jsonify(pharmacies)
+    return pharmacies_schema.jsonify(pharmacies)
 
 @app.route('/api/pharmacies', methods=['POST'])
 def add_pharmacy():
@@ -125,7 +125,7 @@ def login():
         return jsonify({'message': 'Invalid username or password'}), 401
 
     session['user_id'] = user.id
-        return jsonify({'message': 'Login successful'})
+    return jsonify({'message': 'Login successful'})
 
 @app.route('/logout', methods=['POST'])
 def logout():
