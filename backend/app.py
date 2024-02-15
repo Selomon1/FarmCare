@@ -1,4 +1,3 @@
-
 from flask import Flask, request, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
@@ -69,62 +68,6 @@ def get_medications():
     medications = Medication.query.all()
     return medications_schema.jsonify(medications)
 
-@app.route('/api/medications', methods=['POST'])
-def add_medication():
-    name = request.json['name']
-    new_medication = Medication(name=name)
-    db.session.add(new_medication)
-    db.session.commit()
-    return medication_schema.jsonify(new_medication)
-
-@app.route('/api/pharmacies', methods=['GET'])
-def get_pharmacies():
-    pharmacies = Pharmacy.query.all()
-    return pharmacies_schema.jsonify(pharmacies)
-word):
-    self.password_hash = generate_password_hash(password)
-
-def check_password(self, password):
-    return check_password_hash(self.password_hash, password)
-# API Endpoints
-@app.route('/register', methods=['POST'])
-def register():
-    username = request.json.get('username')
-    password = request.json.get('password')
-    role = request.json.get('role')
-
-    if User.query.filter_by(username=username).first():
-        return jsonify({'message': 'Username already exists'}), 400
-
-    new_user = User(username=username, role=role)
-    new_user.set_password(password)
-    db.session.add(new_user)
-    db.session.commit()
-
-    return jsonify({'message': 'User registered successfully'})
-
-@app.route('/login', methods=['POST'])
-def login():
-    username = request.json.get('username')
-    password = request.json.get('password')
-
-    user = User.query.filter_by(username=username).first()
-
-    if not user or not user.check_password(password):
-        return jsonify({'message': 'Invalid username or password'}), 401
-
-    session['user_id'] = user.id
-    return jsonify({'message': 'Login successful'})
-
-@app.route('/', methods=['GET'])
-def index():
-    return "Welcome to the FarmCare!"
-
-@app.route('/api/medications', methods=['GET'])
-def get_medications():
-    medications = Medication.query.all()
-    return medications_schema.jsonify(medications)
-
 @app.route('/api/meications', methods=['POST'])
 def add_medication():
     name = request.json['name']
@@ -133,13 +76,10 @@ def add_medication():
     deb.session.commit()
     return medication_schema.jsonify(new_medication)
 
-@app.route('/api/search', methods=['GET'])
-def search_pharmacies():
-    if 'user_id' not in session:
-        return jsonify({'message': 'Unauthorized'}), 401
-
-    user_location = request.args.get('location')
-    desired_medication = request.args.get('medication')
+@app.route('/api/pharmacies', methods=['GET'])
+def get_pharmacies():
+    pharmacies = Pharmacy.query.all()
+    return pharmacies_scheme.jsonify(pharmacies)
 
 @app.route('/api/pharmacies', methods=['POST'])
 def add_pharmacy():
@@ -199,6 +139,21 @@ def search_pharmacies():
 
     user_location = request.args.get('location')
     desired_medication = request.args.get('medication')
+
+    if not user_location or not desired_medication:
+        return jsonify({'message': 'Location and medication are required parameters'}), 400
+
+    all_pharmacies = Pharmacy.query.all()
+
+    filtered_pharmacies = []
+    for pharmacy in all_pharmacies:
+        for medication in pharmacy.medications:
+            if medication.name == desired_medication:
+                filtered_pharmacies.append(pharmacy)
+
+    result = pharmacies_schema.dump(filtered_pharmacies)
+
+    return jsonify(result)
 
 if __name__ == '__main__':
     app.run(debug=True)
