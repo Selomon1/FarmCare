@@ -1,28 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>FarmCare</title>
-	<link rel=stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FarmCare</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-	<header>
-		<h1>FarmCare</h1>
-		<nav>
-			<ul>
-				<li><a href="#">Home</a></li>
-				<li><a href="#">Medications</a></li>
-				<li><a href="#">Pharmacies</a></li>
-				<li><a href="#">About</a></li>
-				<li><a href="#">Contact</a></li>
-			</ul>
-		</nav>
-	</header>
-	<div id="main-content"></div>
-	<footer>
-		<p>&copy; 2024 FarmCare. All rights reserved.</p>
-	</footer>
-	<script src="index.js"></script>
+    <!-- Sidebar navigation -->
+    <div class="sidebar">
+        <h2>FarmCare</h2>
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#login">Login</a></li>
+            <li><a href="#register-customer">Register as Customer</a></li>
+            <li><a href="#register-pharmacy">Register as Pharmacy Retailer</a></li>
+            <li><a href="#news">News</a></li>
+        </ul>
+    </div>
+
+    <!-- Page content -->
+    <div class="content">
+        <!-- Home section -->
+        <section id="home" class="section">
+            <div class="container">
+                <h1>Welcome to FarmCare</h1>
+                <p>Vision, Mission, Description...</p>
+            </div>
+        </section>
+
+        <!-- Login section -->
+        <section id="login" class="section">
+            <div class="container">
+                <h2>Login</h2>
+                <div class="form-container">
+                    <!-- Login form goes here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Registration section for customer -->
+        <section id="register-customer" class="section">
+            <div class="container">
+                <h2>Register as Customer</h2>
+                <div class="form-container">
+                    <!-- Customer registration form goes here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Registration section for pharmacy retailer -->
+        <section id="register-pharmacy" class="section">
+            <div class="container">
+                <h2>Register as Pharmacy Retailer</h2>
+                <div class="form-container">
+                    <!-- Pharmacy retailer registration form goes here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- News section -->
+        <section id="news" class="section">
+            <div class="container">
+                <h2>News</h2>
+                <p>Latest news and updates...</p>
+            </div>
+        </section>
+    </div>
 </body>
 </html>

@@ -99,27 +99,42 @@ def add_pharmacy():
 
     return render_template('pharmacy_added.html', pharmacy=new_pharmacy)
 
-@app.route('/register', methods=['POST'])
-def register():
+@app.route('/register/customer', methods=['POST'])
+def register_customer():
     username = request.json.get('username')
     password = request.json.get('password')
-    role = request.json.get('role')
 
-    if not username or not password or not role:
-        return jsonify({'message': 'Username, password, and role are required parameters'}), 400
+    if not username or not password:
+        return jsonify({'message': 'Username and password are required parameters'}), 400
 
-    if role == 'pharmacy':
-        if User.query.filter_by(username=username).first():
-            return jsonify({'message': 'Username already exists'}), 400
+    if User.query.filter_by(username=username).first():
+        return jsonify({'message': 'Username already exists'}), 400
 
-        new_user = User(username=username, role=role)
-        new_user.set_password(password)
-        db.session.add(new_user)
-        db.session.commit()
+    new_user = User(username=username, role=role)
+    new_user.set_password(password)
+    db.session.add(new_user)
+    db.session.commit()
 
-        return jsonify({'message': 'User registered successfully'})
+    return jsonify({'message': 'Customer registered successfully'})
 
-    if role == '
+@app.route('/register/pharmacy', methods=['POST'])
+def register_pharmacy():
+    username = request.json.get('username')
+    password = request.json.get('password')
+
+    if not username or not password:
+        return jsonify({'message': 'Username and password are required parameters'}), 400
+
+    if User.query.filter_by(username=username).first():
+        return jsonify({'message': 'Username already exists'}), 400
+
+    new_user = User(username=username, role='pharmacy')
+    new_user.set_password(password)
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({'message': 'Pharmacy registered successfully'})
+
 @app.route('/login', methods=['POST'])
 def login():
     username = request.json.get('username')

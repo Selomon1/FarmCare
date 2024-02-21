@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="widith=device-width, initial-scales=1.0">
+	<title>Medications</title>
+</head>
+<body>
+	<h1>Medications</h1>
+	<ul>
+		{% for medication in medications %}
+			<li>{{ medication.name }}</li>
+		{% endfor %}
+	</ul>
+</body>
+</html>
