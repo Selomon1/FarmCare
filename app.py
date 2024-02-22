@@ -2,16 +2,28 @@ from flask import Flask, render_template, request, jsonify, session, redirect, u
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
+from flask_mail import Mail, Message
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
+import secrets
+import datetime
+from itsdangerous import URLSafeTimedSerializer
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///farmcare.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.secret_key = b'Z;\xe1\xddM\x0b\xd2$T\r\xbc\x0c\xea\xeaoT\x9a-\xef\x7fh\xd5\xc4:'
+app.config['SECRET_KEY'] = b'Z;\xe1\xddM\x0b\xd2$T\r\xbc\x0c\xea\xeaoT\x9a-\xef\x7fh\xd5\xc4:'
+app.config['MAIL_SERVER'] = 'smtp.example.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'your-email@example.com'
+app.config['MAIL_PASSWORD'] = 'your-email-password'
+app.config['MAIL_DEFAULT_SENDER'] = 'your-email@example.com'
+
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 migrate = Migrate(app, db)
+mail = Mail(app)
+serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
 # Define Models
 class Medication(db.Model):
@@ -77,6 +89,12 @@ class User(db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+class PasswordReset(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(100), nullable=False)
+    reset_code = db.Column(db.String(50), nullable=False)
+    expiration_time = db.Column(db.DateTime, nullable=False)
 
 # Routes and Views
 @app.route('/', methods=['GET'])
@@ -264,6 +282,45 @@ def search_pharmacies():
     result = pharmacies_schema.dump(filtered_pharmacies)
 
     return jsonify(result)
+
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form['email']
+        user = User.query.filter_by(email=email).first()
+        if user:
+            reset_code = secrets.token_urlsafe(16)
+            expiration_time = datetime.datetime.now() + datetime.timedelta(hours=1)
+            password_reset = PasswordReset(email=email, reset_code=reset_code, expiration_time=expiration_time)
+            db.session.add(password_reset)
+            db.session.commit()
+            reset_link = url_for('reset_password', reset_code=reset_code, _external=True)
+            msg = Message('Password Reset', recipients=[email])
+            msg.body = f'Click the link to reset your password: {reset_link}'
+            mail.send(msg)
+            return 'An email has been sent with instructions to reset your password.'
+        else:
+            return 'No user found with that email address.'
+    return render_template('forgot_password.html')
+
+@app.route('/reset-password/<reset_code>', methods=['GET', 'POST'])
+def reset_password(reset_code):
+    password_reset = PasswordReset.query.filter_by(reset_code=reset_code).first()
+    if password_reset and password_reset.expiration_time > datetime.datetime.now():
+        if request.method == 'POST':
+            user = User.query.filter_by(email=password_reset.email).first()
+            new_password = request.form['new_password']
+            confirm_new_password = request.form['confirm_new_password']
+            if new_password == confirm_new_password:
+                user.set_password(new_password)
+                db.session.delete(password_reset)
+                db.session.commit()
+                return 'Your password has been successfully updated.'
+            else:
+                return 'Passwords do not match.'
+        return render_template('reset_password.html')
+    else:
+        return 'Invalid or expired reset code.'
 
 if __name__ == '__main__':
     app.run(debug=True)
