@@ -7,6 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import secrets
 from datetime import datetime
 from itsdangerous import URLSafeTimedSerializer
+from sqlalchemy.orm import validates
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///farmcare.db'
@@ -30,12 +31,22 @@ class Medication(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     made_in = db.Column(db.String(100))
-    med_expiry_date = datetime.strptime(med_expiry_date_str, '%Y-%m-%d').date()  # Convert string to Python date object
+    expiry_date = db.Column(db.Date)  # Store as Date field
     dose_value = db.Column(db.Float)  # Numeric value of the dose
     dose_unit = db.Column(db.String(10))
     description = db.Column(db.Text)
     availability = db.Column(db.Boolean, default=True)
     pharmacy_id = db.Column(db.Integer, db.ForeignKey('pharmacy.id'))
+
+    @validates('expiry_date')
+    def validate_expiry_date(self, key, value):
+        if not isinstance(value, datetime.date):
+            # If it's not a date object, try converting it
+            try:
+                return datetime.strptime(value, '%Y-%m-%d').date()
+            except ValueError:
+                raise ValueError('Invalid date format for expiry_date. It should be in YYYY-MM-DD format.')
+        return value
 
 class MedicationSchema(ma.Schema):
     class Meta:
