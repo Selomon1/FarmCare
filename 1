@@ -286,16 +286,6 @@ def add_medication():
 
     return render_template('pharmacy_add_medication.html')
 
-@app.route('/pharmacy/view_medications', methods=['GET'])
-def view_pharmacy_medications():
-    if 'pharmacy_id' not in session:
-        return redirect(url_for('login'))
-
-    pharmacy_id = session['pharmacy_id']
-    pharmacy_medications = Medication.query.filter_by(pharmacy_id=pharmacy_id).all()
-
-    return render_template('view_medications.html', medications=pharmacy_medications)
-
 @app.route('/customer/dashboard', methods=['GET'])
 def customer_dashboard():
     if 'user_id' not in session:
