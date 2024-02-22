@@ -148,7 +148,9 @@ def register_pharmacy():
         db.session.add(new_pharmacy)
         db.session.commit()
 
-        return jsonify({'message': 'Pharmacy registered successfully.'}), 201
+        # Redirect to the login page after successful registration with a success message
+        flash('Registration successful. Please login.')
+        return redirect(url_for('login'))
 
     return render_template('pharmacy_registration.html')
 
@@ -205,7 +207,9 @@ def register_customer():
         db.session.add(new_user)
         db.session.commit()
 
-        return jsonify({'message': 'Customer registered successfully.'}), 201
+        # Redirect to the login page after successful registration with a success message
+        flash('Registration successful. Please login.')
+        return redirect(url_for('login'))
 
     return render_template('customer_registration.html')
 
