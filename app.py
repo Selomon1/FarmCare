@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
@@ -104,6 +104,10 @@ class PasswordReset(db.Model):
 def index():
     return render_template('index.html')
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
 @app.route('/register/pharmacy', methods=['GET', 'POST'])
 def register_pharmacy():
     if request.method == 'POST':
@@ -167,7 +171,7 @@ def register_customer():
         confirm_email = request.form['confirm_email']
         password = request.form['password']
         confirm_password = request.form['confirm_password']
-        date_of_birth = request.form['date_of_birth']
+        date_of_birth_str = request.form['date_of_birth']  # Get date_of_birth as string
         gender = request.form['gender']
         country = request.form['country']
         state = request.form['state']
@@ -177,7 +181,7 @@ def register_customer():
 
         # Validate form data
         if (not first_name or not last_name or not email or not confirm_email or not password or
-                not confirm_password or not date_of_birth or not gender or
+                not confirm_password or not date_of_birth_str or not gender or
                 not country or not address or not contact_phone):
             return jsonify({'message': 'All required fields must be filled.'}), 400
 
@@ -186,6 +190,12 @@ def register_customer():
 
         if password != confirm_password:
             return jsonify({'message': 'Passwords do not match.'}), 400
+
+        # Convert date_of_birth string to a Python date object
+        try:
+            date_of_birth = datetime.strptime(date_of_birth_str, '%Y-%m-%d').date()
+        except ValueError:
+            return jsonify({'message': 'Invalid date format for date of birth.'}), 400
 
         # Check if the email is already registered
         if User.query.filter_by(email=email).first():
@@ -196,7 +206,7 @@ def register_customer():
             first_name=first_name,
             last_name=last_name,
             email=email,
-            date_of_birth=date_of_birth,
+            date_of_birth=date_of_birth,  # Use the converted date_of_birth
             gender=gender,
             country=country,
             state=state,
@@ -256,6 +266,7 @@ def pharmacy_dashboard():
 def add_medication():
     if request.method == 'POST':
         # Retrieve form data
+        print(request.form)
         med_name = request.form['med_name']
         med_made_in = request.form['med_made_in']
         med_dose_value = request.form['med_dose_value']
@@ -311,28 +322,19 @@ def view_medications():
     medications = Medication.query.filter_by(availability=True).all()
     return render_template('view_medications.html', medications=medications)
 
-@app.route('/api/search', methods=['GET'])
+@app.route('/customer/search_pharmacies', methods=['GET'])
 def search_pharmacies():
-    if 'user_id' not in session:
-        return jsonify({'message': 'Unauthorized'}), 401
+    searched_medication = request.args.get('medication')
 
-    user_location = request.args.get('location')
-    desired_medication = request.args.get('medication')
+    if not searched_medication:
+        flash('Please enter a medication name.')
+        return redirect(url_for('customer_dashboard'))
 
-    if not user_location or not desired_medication:
-        return jsonify({'message': 'Location and medication are required parameters'}), 400
+    # Query pharmacies based on the searched medication
+    pharmacies = Pharmacy.query.join(Medication).filter(Medication.name.ilike(f'%{searched_medication}%')).all()
 
-    all_pharmacies = Pharmacy.query.all()
+    return render_template('customer_dashboard.html', pharmacies=pharmacies, searched_medication=searched_medication)
 
-    filtered_pharmacies = []
-    for pharmacy in all_pharmacies:
-        for medication in pharmacy.medications:
-            if medication.name == desired_medication and medication.availability:
-                filtered_pharmacies.append(pharmacy)
-
-    result = pharmacies_schema.dump(filtered_pharmacies)
-
-    return jsonify(result)
 
 @app.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():

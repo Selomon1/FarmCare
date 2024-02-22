@@ -31,6 +31,8 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             padding: 20px;
             margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
         }
 
         .medication-card h2 {
@@ -38,7 +40,12 @@
             margin-bottom: 10px;
         }
 
-        .medication-card p {
+        .medication-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .medication-details p {
             color: #666;
             margin-bottom: 5px;
         }
@@ -62,10 +69,13 @@
         {% for medication in medications %}
         <div class="medication-card">
             <h2>{{ medication.name }}</h2>
-            <p><strong>Batch Number:</strong> {{ medication.batch_number }}</p>
-            <p><strong>Expiry Date:</strong> {{ medication.expiry_date }}</p>
-            <p><strong>Description:</strong> {{ medication.description }}</p>
-            <!-- Add more medication details as needed -->
+            <div class="medication-details">
+                <p><strong>Made In:</strong> {{ medication.made_in }}</p>
+                <p><strong>Dose Value:</strong> {{ medication.dose_value }}</p>
+                <p><strong>Dose Unit:</strong> {{ medication.dose_unit }}</p>
+                <p><strong>Description:</strong> {{ medication.description }}</p>
+                <!-- Add more medication details as needed -->
+            </div>
         </div>
         {% endfor %}
     </div>

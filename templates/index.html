@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FarmCare - Find Pharmacy Retailers</title>
-    <link rel="stylesheet" href="styles.css">
     <style>
-        /* Additional styles specific to this page */
+        /* CSS styles */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -31,15 +30,43 @@
         }
 
         .hero h1 {
-            font-size: 32px; /* Decrease font size */
-            margin-bottom: 10px; /* Decrease bottom margin */
-            font-weight: bold; /* Ensure visibility */
-            color: green; /* Make title green */
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: green;
         }
 
         .hero p {
             font-size: 18px;
             margin-bottom: 0;
+        }
+
+        .navigation {
+            background-color: #0056b3;
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .navigation ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navigation ul li {
+            display: inline;
+            margin: 0 10px;
+        }
+
+        .navigation ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+
+        .navigation ul li a:hover {
+            color: #ffd700; /* Change color on hover */
         }
 
         .features {
@@ -142,10 +169,18 @@
 <body>
     <header class="hero">
         <div class="container">
-            <h1 style="color: green;">FarmCare - Find Pharmacy Retailers Near You</h1>
+            <h1>FarmCare - Find Pharmacy Retailers Near You</h1>
             <p>Find Pharmacy Retailers Near You</p>
         </div>
     </header>
+
+    <nav class="navigation">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/login">Login</a></li>
+        </ul>
+    </nav>
 
     <main>
         <div class="container">
@@ -173,16 +208,6 @@
                     <a href="/register/pharmacy" class="button">Register as Pharmacy Retailer</a>
                 </div>
             </section>
-
-            <section class="search">
-                <h2>Search Pharmacies</h2>
-                <div>
-                    <input type="text" id="location" placeholder="Enter your location">
-                    <input type="text" id="medication" placeholder="Enter desired medication">
-                    <button onclick="searchPharmacies()">Search</button>
-                </div>
-                <ul id="pharmacyList"></ul>
-            </section>
         </div>
     </main>
 
@@ -191,28 +216,5 @@
             <p>&copy; 2024 FarmCare. All rights reserved.</p>
         </div>
     </footer>
-
-    <script>
-        function searchPharmacies() {
-            var location = document.getElementById("location").value;
-            var medication = document.getElementById("medication").value;
-            
-            fetch(`/api/search?location=${location}&medication=${medication}`)
-                .then(response => response.json())
-                .then(data => {
-                    var pharmacyList = document.getElementById("pharmacyList");
-                    pharmacyList.innerHTML = "";
-                    
-                    data.forEach(pharmacy => {
-                        var li = document.createElement("li");
-                        li.textContent = `${pharmacy.company_name} - ${pharmacy.city}, ${pharmacy.state}, ${pharmacy.country}`;
-                        pharmacyList.appendChild(li);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-        }
-    </script>
 </body>
 </html>

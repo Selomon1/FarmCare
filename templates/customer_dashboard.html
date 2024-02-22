@@ -59,6 +59,54 @@
             bottom: 0;
             width: 100%;
         }
+
+        /* Style for the search form */
+        form {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        input[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        /* Style for the pharmacy list */
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        li strong {
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -72,7 +120,33 @@
         </ul>
     </nav>
     <div class="container">
-        <!-- Add customer dashboard content -->
+        <!-- Search medication form -->
+        <form action="{{ url_for('search_pharmacies') }}" method="GET">
+            <label for="medication">Search Medication:</label>
+            <input type="text" id="medication" name="medication" required>
+            <input type="submit" value="Search">
+        </form>
+
+        <!-- Display pharmacies with the searched medication -->
+        {% if pharmacies %}
+            <h2>Pharmacies with "{{ searched_medication }}":</h2>
+            <ul>
+                {% for pharmacy in pharmacies %}
+                    <li>
+                        <strong>Pharmacy Name:</strong> {{ pharmacy.company_name }}<br>
+                        <strong>Address:</strong> {{ pharmacy.address }}<br>
+                        <strong>Location:</strong> {{ pharmacy.city }}, {{ pharmacy.country }}<br>
+                        <strong>Medication Name:</strong> {{ searched_medication }}<br>
+                        <strong>Made In:</strong> {{ pharmacy.medications[0].made_in }}<br>
+                        <strong>Dose Value:</strong> {{ pharmacy.medications[0].dose_value }}<br>
+                        <strong>Dose Unit:</strong> {{ pharmacy.medications[0].dose_unit }}<br>
+                        <strong>Description:</strong> {{ pharmacy.medications[0].description }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No pharmacies found with the medication "{{ searched_medication }}".</p>
+        {% endif %}
     </div>
     <footer>
         <p>&copy; 2024 FarmCare</p>
