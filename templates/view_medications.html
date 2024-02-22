@@ -3,51 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pharmacy Dashboard</title>
+    <title>View Medications</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #f5f5f5;
             margin: 0;
             padding: 0;
         }
 
         header {
-            background-color: #007bff;
-            color: #fff;
+            background-color: #4CAF50;
+            color: white;
             padding: 20px;
             text-align: center;
-        }
-
-        nav {
-            background-color: #333;
-            color: #fff;
-            padding: 10px;
-            text-align: center;
-        }
-
-        nav ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        nav ul li {
-            display: inline;
-            margin-right: 20px;
-        }
-
-        nav ul li a {
-            color: #fff;
-            text-decoration: none;
         }
 
         .container {
             max-width: 800px;
-            margin: 20px auto;
+            margin: 0 auto;
             padding: 20px;
+        }
+
+        .medication-card {
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .medication-card h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .medication-card p {
+            color: #666;
+            margin-bottom: 5px;
         }
 
         footer {
@@ -63,17 +56,18 @@
 </head>
 <body>
     <header>
-        <h1>Welcome to Your Pharmacy Dashboard</h1>
+        <h1>Available Medications</h1>
     </header>
-    <nav>
-        <ul>
-            <li><a href="{{ url_for('pharmacy_dashboard') }}">Dashboard</a></li>
-            <li><a href="{{ url_for('view_medications') }}">View Medications</a></li>
-            <!-- Add more navigation links as needed -->
-        </ul>
-    </nav>
     <div class="container">
-        <!-- Add pharmacy dashboard content -->
+        {% for medication in medications %}
+        <div class="medication-card">
+            <h2>{{ medication.name }}</h2>
+            <p><strong>Batch Number:</strong> {{ medication.batch_number }}</p>
+            <p><strong>Expiry Date:</strong> {{ medication.expiry_date }}</p>
+            <p><strong>Description:</strong> {{ medication.description }}</p>
+            <!-- Add more medication details as needed -->
+        </div>
+        {% endfor %}
     </div>
     <footer>
         <p>&copy; 2024 FarmCare</p>
