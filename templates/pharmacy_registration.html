@@ -1,0 +1,128 @@
+<!-- pharmacy_registration.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacy Registration</title>
+    <link rel="stylesheet" href="https://www.ethiojobs.net/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #007bff;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="tel"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button[type="submit"] {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Pharmacy Registration</h1>
+        <form action="/register/pharmacy" method="POST" class="registration-form">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="confirm_email">Confirm Email:</label>
+                <input type="email" id="confirm_email" name="confirm_email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password:</label>
+                <input type="password" id="confirm_password" name="confirm_password" required>
+            </div>
+            <div class="form-group">
+                <label for="company_name">Company Name:</label>
+                <input type="text" id="company_name" name="company_name" required>
+            </div>
+            <div class="form-group">
+                <label for="country">Country:</label>
+                <input type="text" id="country" name="country" required>
+            </div>
+            <div class="form-group">
+                <label for="state">State/Region:</label>
+                <input type="text" id="state" name="state">
+            </div>
+            <div class="form-group">
+                <label for="city">City:</label>
+                <input type="text" id="city" name="city">
+            </div>
+            <div class="form-group">
+                <label for="contact_name">Contact Name:</label>
+                <input type="text" id="contact_name" name="contact_name">
+            </div>
+            <div class="form-group">
+                <label for="address">Address:</label>
+                <textarea id="address" name="address" required></textarea>
+            </div>
+            <button type="submit">Register</button>
+        </form>
+    </div>
+</body>
+</html>
+

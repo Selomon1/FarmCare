@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacy Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Welcome, {{ pharmacy.name }}!</h1>
+        </div>
+    </header>
+    <main>
+        <div class="container">
+            <section class="dashboard-section">
+                <h2>Medications Availability</h2>
+                <ul>
+                    {% for medication in pharmacy.medications %}
+                    <li>{{ medication.name }} - {{ medication.availability }}</li>
+                    {% endfor %}
+                </ul>
+            </section>
+            <section class="dashboard-section">
+                <h2>New Orders</h2>
+                <p>No new orders.</p>
+            </section>
+        </div>
+    </main>
+    <footer>
+        <div class="container">
+            <a href="/logout">Logout</a>
+        </div>
+    </footer>
+</body>
+</html>
