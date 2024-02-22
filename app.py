@@ -5,7 +5,7 @@ from flask_migrate import Migrate
 from flask_mail import Mail, Message
 from werkzeug.security import generate_password_hash, check_password_hash
 import secrets
-import datetime
+from datetime import datetime
 from itsdangerous import URLSafeTimedSerializer
 
 app = Flask(__name__)
@@ -30,15 +30,16 @@ class Medication(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     made_in = db.Column(db.String(100))
-    expiry_date = db.Column(db.Date)
-    batch_number = db.Column(db.String(50))
+    med_expiry_date = datetime.strptime(med_expiry_date_str, '%Y-%m-%d').date()  # Convert string to Python date object
+    dose_value = db.Column(db.Float)  # Numeric value of the dose
+    dose_unit = db.Column(db.String(10))
     description = db.Column(db.Text)
     availability = db.Column(db.Boolean, default=True)
     pharmacy_id = db.Column(db.Integer, db.ForeignKey('pharmacy.id'))
 
 class MedicationSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'name', 'made_in', 'expiry_date', 'batch_number', 'description', 'availability', 'pharmacy_id')
+        fields = ('id', 'name', 'made_in', 'expiry_date', 'dose_value', 'dose_unit', 'description', 'availability', 'pharmacy_id')
 
 medication_schema = MedicationSchema()
 medications_schema = MedicationSchema(many=True)
@@ -47,7 +48,7 @@ class Pharmacy(db.Model):
     __tablename__ = 'pharmacy'
     id = db.Column(db.Integer, primary_key=True)
     company_name = db.Column(db.String(100), nullable=False)
-    country = db.Column(db.String(100), nullable=False)  # Added country field
+    country = db.Column(db.String(100), nullable=False)
     state = db.Column(db.String(100), nullable=False)
     city = db.Column(db.String(100), nullable=False)
     address = db.Column(db.String(200))
@@ -248,6 +249,43 @@ def pharmacy_dashboard():
     pharmacy = Pharmacy.query.get(pharmacy_id)
 
     return render_template('pharmacy_dashboard.html', pharmacy=pharmacy)
+
+@app.route('/pharmacy/add_medication', methods=['POST'])
+def add_medication():
+    if request.method == 'POST':
+        # Retrieve form data
+        med_name = request.form['med_name']
+        med_made_in = request.form['med_made_in']
+        med_expiry_date_str = request.form['med_expiry_date']  # Get date string from form
+        med_expiry_date = datetime.strptime(med_expiry_date_str, '%Y-%m-%d').date()  # Convert string to Python date object
+        med_dose_value = request.form['med_dose_value']
+        med_dose_unit = request.form['med_dose_unit']
+        med_description = request.form['med_description']
+
+        # Get pharmacy ID from session
+        pharmacy_id = session.get('pharmacy_id')
+
+        # Create a new Medication instance
+        new_medication = Medication(
+            name=med_name,
+            made_in=med_made_in,
+            expiry_date=med_expiry_date,  # Use Python date object
+            dose_value=med_dose_value,
+            dose_unit=med_dose_unit,
+            description=med_description,
+            availability=True,  # Assuming medication is available by default
+            pharmacy_id=pharmacy_id
+        )
+
+        # Add the new medication to the database
+        db.session.add(new_medication)
+        db.session.commit()
+
+        # Redirect to the pharmacy dashboard with a success message
+        flash('Medication added successfully.')
+        return redirect(url_for('pharmacy_dashboard'))
+
+    return render_template('pharmacy_add_medication.html')
 
 @app.route('/customer/dashboard', methods=['GET'])
 def customer_dashboard():

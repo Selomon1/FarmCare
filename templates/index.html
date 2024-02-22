@@ -31,8 +31,10 @@
         }
 
         .hero h1 {
-            font-size: 36px;
-            margin-bottom: 20px;
+            font-size: 32px; /* Decrease font size */
+            margin-bottom: 10px; /* Decrease bottom margin */
+            font-weight: bold; /* Ensure visibility */
+            color: green; /* Make title green */
         }
 
         .hero p {
@@ -86,6 +88,46 @@
             background-color: #0056b3;
         }
 
+        .search {
+            background-color: #f3f4f6;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 40px;
+        }
+
+        .search input,
+        .search button {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        .search button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .search button:hover {
+            background-color: #0056b3;
+        }
+
+        .search ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        .search ul li {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
         footer {
             text-align: center;
             margin-top: 40px;
@@ -100,7 +142,7 @@
 <body>
     <header class="hero">
         <div class="container">
-            <h1>FarmCare</h1>
+            <h1 style="color: green;">FarmCare - Find Pharmacy Retailers Near You</h1>
             <p>Find Pharmacy Retailers Near You</p>
         </div>
     </header>
@@ -131,6 +173,16 @@
                     <a href="/register/pharmacy" class="button">Register as Pharmacy Retailer</a>
                 </div>
             </section>
+
+            <section class="search">
+                <h2>Search Pharmacies</h2>
+                <div>
+                    <input type="text" id="location" placeholder="Enter your location">
+                    <input type="text" id="medication" placeholder="Enter desired medication">
+                    <button onclick="searchPharmacies()">Search</button>
+                </div>
+                <ul id="pharmacyList"></ul>
+            </section>
         </div>
     </main>
 
@@ -139,5 +191,28 @@
             <p>&copy; 2024 FarmCare. All rights reserved.</p>
         </div>
     </footer>
+
+    <script>
+        function searchPharmacies() {
+            var location = document.getElementById("location").value;
+            var medication = document.getElementById("medication").value;
+            
+            fetch(`/api/search?location=${location}&medication=${medication}`)
+                .then(response => response.json())
+                .then(data => {
+                    var pharmacyList = document.getElementById("pharmacyList");
+                    pharmacyList.innerHTML = "";
+                    
+                    data.forEach(pharmacy => {
+                        var li = document.createElement("li");
+                        li.textContent = `${pharmacy.company_name} - ${pharmacy.city}, ${pharmacy.state}, ${pharmacy.country}`;
+                        pharmacyList.appendChild(li);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    </script>
 </body>
 </html>
