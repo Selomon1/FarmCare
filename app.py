@@ -34,10 +34,12 @@ medications_schema = MedicationSchema(many=True)
 class Pharmacy(db.Model):
     __tablename__ = 'pharmacy'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    location = db.Column(db.String(100), nullable=False)
+    company_name = db.Column(db.String(100), nullable=False)
+    country = db.Column(db.String(100), nullable=False)  # Added country field
+    state = db.Column(db.String(100), nullable=False)
+    city = db.Column(db.String(100), nullable=False)
     address = db.Column(db.String(200))
-    owner_name = db.Column(db.String(100), nullable=False)
+    contact_name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
     medications = db.relationship('Medication', backref='pharmacy', lazy=True)
@@ -50,7 +52,7 @@ class Pharmacy(db.Model):
 
 class PharmacySchema(ma.Schema):
     class Meta:
-        fields = ('id', 'name', 'location', 'address', 'owner_name', 'email', 'medications')
+        fields = ('id', 'company_name', 'country', 'state', 'city', 'address', 'contact_name', 'email', 'medications')
 
 pharmacy_schema = PharmacySchema()
 pharmacies_schema = PharmacySchema(many=True)
@@ -58,11 +60,17 @@ pharmacies_schema = PharmacySchema(many=True)
 # Define User Model for Customer
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True, nullable=False)
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
     date_of_birth = db.Column(db.Date)
     gender = db.Column(db.String(10))
+    country = db.Column(db.String(100))
+    state = db.Column(db.String(100))
+    city = db.Column(db.String(100))
+    address = db.Column(db.String(200))
+    contact_phone = db.Column(db.String(20))
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -80,20 +88,19 @@ def register_pharmacy():
     if request.method == 'POST':
         # Retrieve form data
         company_name = request.form['company_name']
-        primary_phone = request.form['primary_phone']
-        contact_number = request.form['contact_number']
-        country = request.form['country']
+        country = request.form['country']  # Added country field
         state = request.form['state']
         city = request.form['city']
         address = request.form['address']
+        contact_name = request.form['contact_name']
         email = request.form['email']
         confirm_email = request.form['confirm_email']
         password = request.form['password']
         confirm_password = request.form['confirm_password']
 
         # Validate form data
-        if (not company_name or not primary_phone or not country or
-                not address or not email or not confirm_email or
+        if (not company_name or not country or not state or not city or
+                not address or not contact_name or not email or not confirm_email or
                 not password or not confirm_password):
             return jsonify({'message': 'All required fields must be filled.'}), 400
 
@@ -110,12 +117,11 @@ def register_pharmacy():
         # Create a new Pharmacy instance
         new_pharmacy = Pharmacy(
             company_name=company_name,
-            primary_phone=primary_phone,
-            contact_number=contact_number,
             country=country,
             state=state,
             city=city,
             address=address,
+            contact_name=contact_name,
             email=email
         )
         new_pharmacy.set_password(password)
@@ -132,23 +138,24 @@ def register_pharmacy():
 def register_customer():
     if request.method == 'POST':
         # Retrieve form data
-        username = request.form['username']
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
         email = request.form['email']
         confirm_email = request.form['confirm_email']
         password = request.form['password']
         confirm_password = request.form['confirm_password']
         date_of_birth = request.form['date_of_birth']
         gender = request.form['gender']
-        contact_phone = request.form['contact_phone']
         country = request.form['country']
         state = request.form['state']
         city = request.form['city']
         address = request.form['address']
+        contact_phone = request.form['contact_phone']
 
         # Validate form data
-        if (not username or not email or not confirm_email or not password or
+        if (not first_name or not last_name or not email or not confirm_email or not password or
                 not confirm_password or not date_of_birth or not gender or
-                not country or not address):
+                not country or not address or not contact_phone):
             return jsonify({'message': 'All required fields must be filled.'}), 400
 
         if email != confirm_email:
@@ -163,15 +170,16 @@ def register_customer():
 
         # Create a new User instance
         new_user = User(
-            username=username,
+            first_name=first_name,
+            last_name=last_name,
             email=email,
             date_of_birth=date_of_birth,
             gender=gender,
-            contact_phone=contact_phone,
             country=country,
             state=state,
             city=city,
-            address=address
+            address=address,
+            contact_phone=contact_phone
         )
         new_user.set_password(password)
 
@@ -253,13 +261,9 @@ def search_pharmacies():
             if medication.name == desired_medication and medication.availability:
                 filtered_pharmacies.append(pharmacy)
 
-    # You can implement the logic for finding the closest pharmacy using Google Maps API here
-
     result = pharmacies_schema.dump(filtered_pharmacies)
 
     return jsonify(result)
-
-# Other routes...
 
 if __name__ == '__main__':
     app.run(debug=True)

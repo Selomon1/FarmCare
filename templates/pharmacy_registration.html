@@ -1,4 +1,3 @@
-<!-- pharmacy_registration.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,9 +42,7 @@
 
         input[type="text"],
         input[type="email"],
-        input[type="password"],
-        input[type="tel"],
-        textarea {
+        input[type="password"] {
             width: 100%;
             padding: 10px;
             font-size: 16px;
@@ -70,42 +67,49 @@
         button[type="submit"]:hover {
             background-color: #0056b3;
         }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Pharmacy Registration</h1>
-        <form action="/register/pharmacy" method="POST" class="registration-form">
+        <form id="pharmacyRegistrationForm" method="POST" action="/register/pharmacy">
             <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
+                <label for="company_name">Company Name:</label>
+                <input type="text" id="company_name" name="company_name" required>
+                <span class="error-message" id="companyNameError"></span>
             </div>
             <div class="form-group">
                 <label for="email">Email:</label>
                 <input type="email" id="email" name="email" required>
+                <span class="error-message" id="emailError"></span>
             </div>
             <div class="form-group">
                 <label for="confirm_email">Confirm Email:</label>
                 <input type="email" id="confirm_email" name="confirm_email" required>
+                <span class="error-message" id="confirmEmailError"></span>
             </div>
             <div class="form-group">
                 <label for="password">Password:</label>
                 <input type="password" id="password" name="password" required>
+                <span class="error-message" id="passwordError"></span>
             </div>
             <div class="form-group">
                 <label for="confirm_password">Confirm Password:</label>
                 <input type="password" id="confirm_password" name="confirm_password" required>
-            </div>
-            <div class="form-group">
-                <label for="company_name">Company Name:</label>
-                <input type="text" id="company_name" name="company_name" required>
+                <span class="error-message" id="confirmPasswordError"></span>
             </div>
             <div class="form-group">
                 <label for="country">Country:</label>
-                <input type="text" id="country" name="country" required>
+                <input type="text" id="country" name="country">
             </div>
             <div class="form-group">
-                <label for="state">State/Region:</label>
+                <label for="state">State:</label>
                 <input type="text" id="state" name="state">
             </div>
             <div class="form-group">
@@ -119,10 +123,69 @@
             <div class="form-group">
                 <label for="address">Address:</label>
                 <textarea id="address" name="address" required></textarea>
+                <span class="error-message" id="addressError"></span>
             </div>
             <button type="submit">Register</button>
         </form>
     </div>
+
+    <script>
+        document.getElementById("pharmacyRegistrationForm").addEventListener("submit", function(event) {
+            var companyName = document.getElementById("company_name").value.trim();
+            var email = document.getElementById("email").value.trim();
+            var confirmEmail = document.getElementById("confirm_email").value.trim();
+            var password = document.getElementById("password").value.trim();
+            var confirmPassword = document.getElementById("confirm_password").value.trim();
+            var address = document.getElementById("address").value.trim();
+
+            var isValid = true;
+
+            if (companyName === "") {
+                document.getElementById("companyNameError").innerText = "Company Name is required";
+                isValid = false;
+            } else {
+                document.getElementById("companyNameError").innerText = "";
+            }
+
+            if (email === "") {
+                document.getElementById("emailError").innerText = "Email is required";
+                isValid = false;
+            } else {
+                document.getElementById("emailError").innerText = "";
+            }
+
+            if (confirmEmail === "") {
+                document.getElementById("confirmEmailError").innerText = "Confirm Email is required";
+                isValid = false;
+            } else {
+                document.getElementById("confirmEmailError").innerText = "";
+            }
+
+            if (password === "") {
+                document.getElementById("passwordError").innerText = "Password is required";
+                isValid = false;
+            } else {
+                document.getElementById("passwordError").innerText = "";
+            }
+
+            if (confirmPassword === "") {
+                document.getElementById("confirmPasswordError").innerText = "Confirm Password is required";
+                isValid = false;
+            } else {
+                document.getElementById("confirmPasswordError").innerText = "";
+            }
+
+            if (address === "") {
+                document.getElementById("addressError").innerText = "Address is required";
+                isValid = false;
+            } else {
+                document.getElementById("addressError").innerText = "";
+            }
+
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+    </script>
 </body>
 </html>
-
