@@ -322,6 +322,51 @@ def view_medications():
     medications = Medication.query.filter_by(availability=True).all()
     return render_template('view_medications.html', medications=medications)
 
+@app.route('/pharmacy/edit_medication/<int:medication_id>', methods=['GET', 'POST'])
+def edit_medication(medication_id):
+    if request.method == 'POST':
+        # Retrieve form data
+        med_name = request.form['med_name']
+        med_made_in = request.form['med_made_in']
+        med_dose_value = request.form['med_dose_value']
+        med_dose_unit = request.form['med_dose_unit']
+        med_description = request.form['med_description']
+
+        # Get the Medication instance from the database
+        medication = Medication.query.get(medication_id)
+
+        # Update the Medication instance
+        medication.name = med_name
+        medication.made_in = med_made_in
+        medication.dose_value = med_dose_value
+        medication.dose_unit = med_dose_unit
+        medication.description = med_description
+
+        # Commit the changes to the database
+        db.session.commit()
+
+        # Redirect to the pharmacy dashboard with a success message
+        flash('Medication updated successfully.')
+        return redirect(url_for('pharmacy_dashboard'))
+
+    # Fetch the Medication data to pre-fill the form
+    medication = Medication.query.get(medication_id)
+
+    return render_template('pharmacy_edit_medication.html', medication=medication)
+
+@app.route('/delete-medication', methods=['DELETE'])
+def delete_medication():
+    medication_id = request.args.get('id')
+
+    # Find and delete the Medication instance from the database
+    medication = Medication.query.get(medication_id)
+    if medication:
+        db.session.delete(medication)
+        db.session.commit()
+        return jsonify({'message': 'Medication deleted successfully.'})
+    else:
+        return jsonify({'message': 'Medication not found.'}), 404
+
 @app.route('/customer/search_pharmacies', methods=['GET'])
 def search_pharmacies():
     searched_medication = request.args.get('medication')
