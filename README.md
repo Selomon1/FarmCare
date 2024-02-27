@@ -1,23 +1,24 @@
 ### FarmCare
 #### Introduction
 FarmCare is a web application designed to streamline pharmacy inventory management and customer profiles. It offers features for pharmacies to manage their medication inventory and for customers to create profiles, search for medications, and find pharmacies that carry specific medications.
+
 ![Screenshot](Screenshot.png)
+
+## Inspiration
+The idea for FarmCare stemmed from personal experiences witnessing the complexities of medication management, including tracking multiple prescriptions, managing refills, and coordinating with pharmacies. Recognizing the potential for technology to simplify these processes and improve medication adherence, we embarked on the journey to create FarmCare.
+
+## Technology & Architecture
+FarmCare is built using the Flask framework for the backend, with SQLAlchemy for database management and Flask-Marshmallow for serialization. The frontend is developed using HTML, CSS, and JavaScript, with Jinja2 templates for rendering dynamic content. The application follows a client-server architecture, with the backend handling data processing and the frontend providing an intuitive user interface.
+
+## Core Algorithms and Code Snippet
+One of the core algorithms in FarmCare is the medication search functionality, which allows users to find medications based on various criteria such as name, dosage, and availability. Below is a code snippet illustrating the implementation of this algorithm:
+
 #### Features
 
 - View a list of medications
 - Add new medications
 - View a list of pharmacies
 - Add new pharmacies
-
-#### Technologies used
-
-- **Backend:**
-  - Flask -
-  - SQLite -
-
-- **Frontend:**
-  - HTML/CSS -
-  - JavaScript -
 
 #### Deployment
 - **Deployed Site:** [FarmCare](https://selo.pythonanywhere.com/)
