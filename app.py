@@ -229,6 +229,8 @@ def register_customer():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    error_message = None
+
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
@@ -243,9 +245,9 @@ def login():
             session['user_id'] = customer.id
             return redirect(url_for('customer_dashboard'))
         else:
-            return jsonify({'message': 'Invalid email or password'}), 401
+            error_message = 'Invalid email or password'
 
-    return render_template('login.html')
+    return render_template('login.html', error_message=error_message)
 
 # Route for rendering the profile page
 @app.route('/pharmacy_profile')

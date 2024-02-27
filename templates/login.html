@@ -5,7 +5,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="https://www.ethiojobs.net/styles.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -78,6 +77,9 @@
 <body>
     <div class="container">
         <h1>Login</h1>
+        {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+        {% endif %}
         <form id="loginForm" method="POST" action="/login">
             <input type="email" name="email" placeholder="Email" required>
             <input type="password" name="password" placeholder="Password" required>
@@ -94,7 +96,19 @@
 
     <script>
         document.getElementById("loginForm").addEventListener("submit", function(event) {
-            // JavaScript validation here
+            var email = document.getElementsByName("email")[0].value;
+            var password = document.getElementsByName("password")[0].value;
+            var errorMessage = document.getElementById("errorMessage");
+
+            // Reset error message
+            errorMessage.textContent = "";
+
+            // Example: Basic validation for demonstration
+            if (email.trim() === "" || password.trim() === "") {
+                errorMessage.textContent = "Email and password are required."; // Display error message
+                event.preventDefault(); // Prevent form submission
+            }
+            // No need for else block here, let the form submit and handle validation on server-side
         });
     </script>
 </body>
