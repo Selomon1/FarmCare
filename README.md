@@ -20,9 +20,9 @@ FarmCare is a web application designed to streamline pharmacy inventory manageme
   - JavaScript -
 
 #### Deployment
-- **Deployed Site:** [FarmCare](https://farmcare.herokuapp.com/)
-- **Final Project Blog Article:** [FarmCare: Revolutionizing Pharmacy Management](https://medium.com/farmcare/revolutionizing-pharmacy-management-abc123)
-- **Author's LinkedIn:** [John Doe](https://www.linkedin.com/in/johndoe/)
+- **Deployed Site:** [FarmCare](https://selo.pythonanywhere.com/)
+- **Final Project Blog Article:** [Portfolio Project Blog post FarmCare](https://medium.com/@Selomon1/d1d324c38668)
+- **Author's LinkedIn:** [Selomon Teshome](https://www.linkedin.com/in/selomon-teshome-14957218b)
 
 #### Installation
 To run FarmCare locally, follow these steps:
