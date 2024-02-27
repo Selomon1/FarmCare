@@ -249,33 +249,47 @@ def login():
 
     return render_template('login.html', error_message=error_message)
 
-# Route for rendering the profile page
-@app.route('/pharmacy_profile')
+# Route for rendering the pharmacy profile page
+@app.route('/pharmacy_profile', methods=['GET', 'POST'])
 def pharmacy_profile():
-    # Check if user is logged in
-    if 'user_id' not in session:
-        flash('Please log in to view your profile.')
+    # Check if pharmacy is logged in
+    if 'pharmacy_id' not in session:
+        flash('Please log in to view your pharmacy profile.')
         return redirect(url_for('login'))
 
-    # Retrieve user ID from session
-    user_id = session['user_id']
+    # Retrieve pharmacy ID from session
+    pharmacy_id = session['pharmacy_id']
 
-    # Fetch user data from the database
-    user = User.query.get(user_id)
+    # Fetch pharmacy data from the database
+    pharmacy = Pharmacy.query.get(pharmacy_id)
 
-    # Prepare customer data dictionary
-    customer_data = {
-        "first_name": user.first_name,
-        "last_name": user.last_name,
-        "email": user.email,
-        "date_of_birth": user.date_of_birth,
-        "gender": user.gender,
-        "country": user.country,
-        "state": user.state,
-        "city": user.city,
-        "address": user.address,
-        "contact_phone": user.contact_phone,
-        # Add other customer data here
+    if request.method == 'POST':
+        # Process form submission and update pharmacy profile in the database
+        # Retrieve form data
+        pharmacy.company_name = request.form['company_name']
+        pharmacy.country = request.form['country']
+        pharmacy.state = request.form['state']
+        pharmacy.city = request.form['city']
+        pharmacy.address = request.form['address']
+        pharmacy.contact_name = request.form['contact_name']
+        pharmacy.email = request.form['email']
+
+        # Commit changes to the database
+        db.session.commit()
+
+        # Redirect to the pharmacy dashboard after successfully updating the profile
+        return redirect(url_for('pharmacy_dashboard'))
+
+    # Prepare pharmacy data dictionary
+    pharmacy_data = {
+        "company_name": pharmacy.company_name,
+        "country": pharmacy.country,
+        "state": pharmacy.state,
+        "city": pharmacy.city,
+        "address": pharmacy.address,
+        "contact_name": pharmacy.contact_name,
+        "email": pharmacy.email
+        # Add other pharmacy data here
     }
 
     return render_template('pharmacy_profile.html', pharmacy_data=pharmacy_data)
@@ -370,6 +384,47 @@ def change_password():
         return redirect(url_for('customer_dashboard'))
 
     return render_template('change_password.html')
+
+@app.route('/pharmacy_change_password', methods=['GET', 'POST'])
+def pharmacy_change_password():
+    if request.method == 'POST':
+        # Retrieve form data
+        current_password = request.form['current_password']
+        new_password = request.form['new_password']
+        confirm_new_password = request.form['confirm_new_password']
+
+        app.logger.info(f"Received form data: current_password={current_password}, new_password={new_password}, confirm_new_password={confirm_new_password}")
+
+        # Check if the password matches the pharmacy's actual password
+        pharmacy_id = session.get('pharmacy_id')
+        app.logger.info(f"Pharmacy ID from session: {pharmacy_id}")
+        if pharmacy_id is None:
+            flash('Pharmacy ID not found in session. Please log in again.', 'error')
+            return redirect(url_for('login'))
+
+        pharmacy = Pharmacy.query.get(pharmacy_id)
+        app.logger.info(f"Retrieved pharmacy from database: {pharmacy}")
+        if pharmacy is None:
+            flash('Pharmacy not found in the database.', 'error')
+            return redirect(url_for('login'))
+
+        if not pharmacy.check_password(current_password):
+            flash('Incorrect password. Please try again.', 'error')
+            return redirect(url_for('pharmacy_change_password'))
+
+        # Check if the new password and confirm new password match
+        if new_password != confirm_new_password:
+            flash('New password and confirm new password do not match.', 'error')
+            return redirect(url_for('pharmacy_change_password'))
+
+        # Set the new password and commit changes to the database
+        pharmacy.set_password(new_password)
+        db.session.commit()
+
+        flash('Password updated successfully.', 'success')
+        return redirect(url_for('pharmacy_dashboard'))
+
+    return render_template('pharmacy_change_password.html')
 
 @app.route('/logout', methods=['GET'])
 def logout():

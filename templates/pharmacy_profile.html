@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacy Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="date"] {
+            width: calc(100% - 16px); /* Adjust for padding */
+        }
+
+        .btn-container {
+            text-align: center;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .btn.cancel {
+            background-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Pharmacy Profile</h1>
+        <form id="pharmacyProfileForm" method="POST" action="/pharmacy_profile">
+            <input type="text" name="company_name" placeholder="Company Name" value="{{ pharmacy_data.company_name }}" required>
+            <input type="text" name="country" placeholder="Country" value="{{ pharmacy_data.country }}" required>
+            <input type="text" name="state" placeholder="State" value="{{ pharmacy_data.state }}" required>
+            <input type="text" name="city" placeholder="City" value="{{ pharmacy_data.city }}" required>
+            <input type="text" name="address" placeholder="Address" value="{{ pharmacy_data.address }}" required>
+            <input type="text" name="contact_name" placeholder="Contact Name" value="{{ pharmacy_data.contact_name }}" required>
+            <input type="email" name="email" placeholder="Email" value="{{ pharmacy_data.email }}" required>
+            <div class="btn-container">
+                <button type="submit" class="btn">Update Profile</button>
+                <a href="{{ url_for('pharmacy_dashboard') }}" class="btn cancel">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Your JavaScript code -->
+    <script>
+        document.getElementById("pharmacyProfileForm").addEventListener("submit", function(event) {
+            // JavaScript validation here
+        });
+    </script>
+</body>
+</html>
