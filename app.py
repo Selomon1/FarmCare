@@ -9,6 +9,7 @@ import datetime
 from datetime import datetime, date
 from itsdangerous import URLSafeTimedSerializer
 from sqlalchemy.orm import validates
+import logging
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///farmcare.db'
@@ -335,23 +336,35 @@ def change_password():
         new_password = request.form['new_password']
         confirm_new_password = request.form['confirm_new_password']
 
-        # Check if the current password matches the user's actual password
+        app.logger.info(f"Received form data: current_password={current_password}, new_password={new_password}, confirm_new_password={confirm_new_password}")
+
+        # Check if the password matches the user's actual password
         user_id = session.get('user_id')
+        app.logger.info(f"User ID from session: {user_id}")
+        if user_id is None:
+            flash('User ID not found in session. Please log in again.', 'error')
+            return redirect(url_for('login'))
+
         user = User.query.get(user_id)
+        app.logger.info(f"Retrieved user from database: {user}")
+        if user is None:
+            flash('User not found in the database.', 'error')
+            return redirect(url_for('login'))
+
         if not user.check_password(current_password):
-            flash('Incorrect current password. Please try again.')
+            flash('Incorrect password. Please try again.', 'error')
             return redirect(url_for('change_password'))
 
         # Check if the new password and confirm new password match
         if new_password != confirm_new_password:
-            flash('New password and confirm new password do not match.')
+            flash('New password and confirm new password do not match.', 'error')
             return redirect(url_for('change_password'))
 
         # Set the new password and commit changes to the database
         user.set_password(new_password)
         db.session.commit()
 
-        flash('Password updated successfully.')
+        flash('Password updated successfully.', 'success')
         return redirect(url_for('customer_dashboard'))
 
     return render_template('change_password.html')
