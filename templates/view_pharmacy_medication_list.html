@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacy Medications</title>
+    <style>
+        /* Add your CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center; /* Align items vertically */
+        }
+        .logout-btn {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 4px;
+            background-color: #007bff; /* Update button color */
+            transition: background-color 0.3s ease;
+        }
+        .logout-btn:hover {
+            background-color: #0056b3; /* Darken color on hover */
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+            color: #333;
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+        .action-buttons button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .edit-btn {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .edit-btn:hover {
+            background-color: #0056b3;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+            color: #fff;
+            margin-left: 5px; /* Adjust margin */
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+	.notification {
+    	    position: fixed;
+    	    top: 20px;
+    	    left: 50%;
+    	    transform: translateX(-50%);
+    	    padding: 15px 20px;
+    	    border-radius: 8px;
+    	    font-weight: bold;
+    	    z-index: 9999;
+    	    opacity: 0;
+    	    transition: opacity 0.3s ease;
+    	    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	}
+	.success {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .error {
+            background-color: #dc3545;
+            color: white;
+        }
+        .add-medication-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        footer {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Pharmacy Medications</h1>
+    <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+</header>
+
+<div class="container">
+    <table>
+        <thead>
+            <tr>
+                <th>S.No</th>
+                <th>Medication Name</th>
+                <th>Made In</th>
+                <th>Dose Value</th>
+                <th>Dose Unit</th>
+                <th>Description</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for medication in medications %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ medication.name }}</td>
+                <td>{{ medication.made_in }}</td>
+                <td>{{ medication.dose_value }}</td>
+                <td>{{ medication.dose_unit }}</td>
+                <td>{{ medication.description }}</td>
+                <td class="action-buttons">
+                    <button class="edit-btn" onclick="editMedication('{{ medication.id }}')">Edit</button>
+                    <button class="delete-btn" onclick="deleteMedication('{{ medication.id }}')">Delete</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{{ url_for('pharmacy_dashboard') }}" class="add-medication-btn">Add Medication</a>
+</div>
+
+<footer>
+    <p>&copy; 2024 FarmCare</p>
+</footer>
+
+<!-- JavaScript for handling edit and delete actions -->
+<script>
+    function editMedication(medicationId) {
+        // Redirect to the pharmacy dashboard with the medication ID as a parameter
+        window.location.href = "{{ url_for('edit_medication', medication_id=0) }}".replace('0', medicationId);
+    }
+
+    function deleteMedication(medicationId) {
+        // Display a styled confirmation dialog
+        const confirmation = confirm("Are you sure you want to delete this medication?");
+        if (confirmation) {
+            // Send an AJAX request to delete the medication
+            fetch("/pharmacy/delete_medication/" + medicationId, {
+                method: "DELETE"
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Medication deleted successfully
+                    // Show a success notification
+                    showNotification('Medication deleted successfully', 'success');
+                    // Reload the page to reflect changes
+                    window.location.reload();
+                } else {
+                    // Error occurred while deleting medication
+                    // Show an error notification
+                    showNotification('Error deleting medication. Please try again later.', 'error');
+                }
+            })
+            .catch(error => {
+                // Error occurred while sending the request
+                // Show an error notification
+                console.error('Error:', error);
+                showNotification('Error deleting medication. Please try again later.', 'error');
+            });
+        }
+    }
+
+    // Function to show a notification
+    function showNotification(message, type) {
+        const notification = document.createElement('div');
+        notification.classList.add('notification', type);
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Medication</title>
+    <style>
+        /* CSS styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center; /* Align items vertically */
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        input[type="submit"],
+        .cancel-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        input[type="submit"]:hover,
+        .cancel-btn:hover {
+            background-color: #0056b3;
+        }
+        .cancel-btn {
+            background-color: #dc3545;
+            margin-left: 10px;
+        }
+        footer {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Edit Medication</h1>
+</header>
+
+<div class="container">
+    <form action="{{ url_for('edit_medication', medication_id=medication.id) }}" method="POST">
+        <label for="med_name">Medication Name:</label><br>
+        <input type="text" id="med_name" name="med_name" value="{{ medication.name }}"><br>
+
+        <label for="med_made_in">Made In:</label><br>
+        <input type="text" id="med_made_in" name="med_made_in" value="{{ medication.made_in }}"><br>
+
+        <label for="med_dose_value">Dose Value:</label><br>
+        <input type="text" id="med_dose_value" name="med_dose_value" value="{{ medication.dose_value }}"><br>
+
+        <label for="med_dose_unit">Dose Unit:</label><br>
+        <input type="text" id="med_dose_unit" name="med_dose_unit" value="{{ medication.dose_unit }}"><br>
+
+        <label for="med_description">Description:</label><br>
+        <textarea id="med_description" name="med_description">{{ medication.description }}</textarea><br>
+
+        <input type="submit" value="Update Medication">
+        <a href="{{ url_for('view_pharmacy_medications') }}" class="cancel-btn">Cancel</a>
+    </form>
+</div>
+
+<footer>
+    <p>&copy; 2024 FarmCare</p>
+</footer>
+
+</body>
+</html>

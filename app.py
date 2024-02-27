@@ -246,6 +246,116 @@ def login():
 
     return render_template('login.html')
 
+# Route for rendering the profile page
+@app.route('/pharmacy_profile')
+def pharmacy_profile():
+    # Check if user is logged in
+    if 'user_id' not in session:
+        flash('Please log in to view your profile.')
+        return redirect(url_for('login'))
+
+    # Retrieve user ID from session
+    user_id = session['user_id']
+
+    # Fetch user data from the database
+    user = User.query.get(user_id)
+
+    # Prepare customer data dictionary
+    customer_data = {
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "email": user.email,
+        "date_of_birth": user.date_of_birth,
+        "gender": user.gender,
+        "country": user.country,
+        "state": user.state,
+        "city": user.city,
+        "address": user.address,
+        "contact_phone": user.contact_phone,
+        # Add other customer data here
+    }
+
+    return render_template('pharmacy_profile.html', pharmacy_data=pharmacy_data)
+
+@app.route('/profile', methods=['GET', 'POST'])
+def profile():
+    # Check if user is logged in
+    if 'user_id' not in session:
+        flash('Please log in to view your profile.')
+        return redirect(url_for('login'))
+
+    # Retrieve user ID from session
+    user_id = session['user_id']
+
+    # Fetch user data from the database
+    user = User.query.get(user_id)
+
+    if request.method == 'POST':
+        # Process form submission and update profile in the database
+        # Retrieve form data
+        user.first_name = request.form['first_name']
+        user.last_name = request.form['last_name']
+        user.email = request.form['email']
+        user.date_of_birth = datetime.strptime(request.form['date_of_birth'], '%Y-%m-%d')
+        user.gender = request.form['gender']
+        user.country = request.form['country']
+        user.state = request.form['state']
+        user.city = request.form['city']
+        user.address = request.form['address']
+        user.contact_phone = request.form['contact_phone']
+
+        # Commit changes to the database
+        db.session.commit()
+
+        # Redirect to the customer dashboard after successfully updating the profile
+        return redirect(url_for('customer_dashboard'))
+
+    # Prepare customer data dictionary
+    customer_data = {
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "email": user.email,
+        "date_of_birth": user.date_of_birth,
+        "gender": user.gender,
+        "country": user.country,
+        "state": user.state,
+        "city": user.city,
+        "address": user.address,
+        "contact_phone": user.contact_phone,
+        # Add other customer data here
+    }
+
+    return render_template('profile.html', customer_data=customer_data)
+
+@app.route('/change_password', methods=['GET', 'POST'])
+def change_password():
+    if request.method == 'POST':
+        # Retrieve form data
+        current_password = request.form['current_password']
+        new_password = request.form['new_password']
+        confirm_new_password = request.form['confirm_new_password']
+
+        # Check if the current password matches the user's actual password
+        user_id = session.get('user_id')
+        user = User.query.get(user_id)
+        if not user.check_password(current_password):
+            flash('Incorrect current password. Please try again.')
+            return redirect(url_for('change_password'))
+
+        # Check if the new password and confirm new password match
+        if new_password != confirm_new_password:
+            flash('New password and confirm new password do not match.')
+            return redirect(url_for('change_password'))
+
+        # Set the new password and commit changes to the database
+        user.set_password(new_password)
+        db.session.commit()
+
+        flash('Password updated successfully.')
+        return redirect(url_for('customer_dashboard'))
+
+    return render_template('change_password.html')
+
 @app.route('/logout', methods=['GET'])
 def logout():
     session.pop('pharmacy_id', None)
@@ -297,16 +407,6 @@ def add_medication():
 
     return render_template('pharmacy_add_medication.html')
 
-@app.route('/pharmacy/view_medications', methods=['GET'])
-def view_pharmacy_medications():
-    if 'pharmacy_id' not in session:
-        return redirect(url_for('login'))
-
-    pharmacy_id = session['pharmacy_id']
-    pharmacy_medications = Medication.query.filter_by(pharmacy_id=pharmacy_id).all()
-
-    return render_template('view_medications.html', medications=pharmacy_medications)
-
 @app.route('/customer/dashboard', methods=['GET'])
 def customer_dashboard():
     if 'user_id' not in session:
@@ -317,6 +417,16 @@ def customer_dashboard():
 
     return render_template('customer_dashboard.html', user=user)
 
+@app.route('/pharmacy/view_medications', methods=['GET'])
+def view_pharmacy_medications():
+    if 'pharmacy_id' not in session:
+        return redirect(url_for('login'))
+
+    pharmacy_id = session['pharmacy_id']
+    pharmacy_medications = Medication.query.filter_by(pharmacy_id=pharmacy_id, availability=True).all()
+
+    return render_template('view_pharmacy_medication_list.html', medications=pharmacy_medications)
+
 @app.route('/customer/medications', methods=['GET'])
 def view_medications():
     medications = Medication.query.filter_by(availability=True).all()
@@ -324,48 +434,39 @@ def view_medications():
 
 @app.route('/pharmacy/edit_medication/<int:medication_id>', methods=['GET', 'POST'])
 def edit_medication(medication_id):
+    medication = Medication.query.get_or_404(medication_id)
+
     if request.method == 'POST':
-        # Retrieve form data
-        med_name = request.form['med_name']
-        med_made_in = request.form['med_made_in']
-        med_dose_value = request.form['med_dose_value']
-        med_dose_unit = request.form['med_dose_unit']
-        med_description = request.form['med_description']
+        # Update medication data
+        medication.name = request.form['med_name']
+        medication.made_in = request.form['med_made_in']
+        medication.dose_value = request.form['med_dose_value']
+        medication.dose_unit = request.form['med_dose_unit']
+        medication.description = request.form['med_description']
 
-        # Get the Medication instance from the database
-        medication = Medication.query.get(medication_id)
-
-        # Update the Medication instance
-        medication.name = med_name
-        medication.made_in = med_made_in
-        medication.dose_value = med_dose_value
-        medication.dose_unit = med_dose_unit
-        medication.description = med_description
-
-        # Commit the changes to the database
+        # Commit changes to the database
         db.session.commit()
 
-        # Redirect to the pharmacy dashboard with a success message
         flash('Medication updated successfully.')
-        return redirect(url_for('pharmacy_dashboard'))
-
-    # Fetch the Medication data to pre-fill the form
-    medication = Medication.query.get(medication_id)
+        return redirect(url_for('view_pharmacy_medications'))
 
     return render_template('pharmacy_edit_medication.html', medication=medication)
 
-@app.route('/delete-medication', methods=['DELETE'])
-def delete_medication():
-    medication_id = request.args.get('id')
+@app.route('/pharmacy/cancel_edit', methods=['GET'])
+def cancel_edit():
+    flash('Edit operation canceled.')
+    return redirect(url_for('pharmacy_dashboard'))
 
-    # Find and delete the Medication instance from the database
-    medication = Medication.query.get(medication_id)
-    if medication:
-        db.session.delete(medication)
-        db.session.commit()
-        return jsonify({'message': 'Medication deleted successfully.'})
-    else:
-        return jsonify({'message': 'Medication not found.'}), 404
+@app.route('/pharmacy/delete_medication/<int:medication_id>', methods=['DELETE'])
+def delete_medication(medication_id):
+    # Find the medication by its ID
+    medication = Medication.query.get_or_404(medication_id)
+
+    # Delete the medication from the database
+    db.session.delete(medication)
+    db.session.commit()
+
+    return 'Medication deleted successfully', 200
 
 @app.route('/customer/search_pharmacies', methods=['GET'])
 def search_pharmacies():

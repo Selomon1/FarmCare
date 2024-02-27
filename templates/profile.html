@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="date"] {
+            width: calc(100% - 16px); /* Adjust for padding */
+        }
+
+        .btn-container {
+            text-align: center;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .btn.cancel {
+            background-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Customer Profile</h1>
+        <form id="customerProfileForm" method="POST" action="/profile">
+            <input type="text" name="first_name" placeholder="First Name" value="{{ customer_data.first_name }}" required>
+            <input type="text" name="last_name" placeholder="Last Name" value="{{ customer_data.last_name }}" required>
+            <input type="email" name="email" placeholder="Email" value="{{ customer_data.email }}" required>
+            <input type="date" name="date_of_birth" placeholder="Date of Birth" value="{{ customer_data.date_of_birth }}" required>
+            <select name="gender" required>
+                <option value="male" {% if customer_data.gender == 'male' %} selected {% endif %}>Male</option>
+                <option value="female" {% if customer_data.gender == 'female' %} selected {% endif %}>Female</option>
+                <option value="other" {% if customer_data.gender == 'other' %} selected {% endif %}>Other</option>
+            </select>
+            <input type="text" name="country" placeholder="Country" value="{{ customer_data.country }}" required>
+            <input type="text" name="state" placeholder="State" value="{{ customer_data.state }}" required>
+            <input type="text" name="city" placeholder="City" value="{{ customer_data.city }}" required>
+            <input type="text" name="address" placeholder="Address" value="{{ customer_data.address }}" required>
+            <input type="text" name="contact_phone" placeholder="Contact Phone" value="{{ customer_data.contact_phone }}" required>
+            <div class="btn-container">
+                <button type="submit" class="btn">Update Profile</button>
+                <a href="{{ url_for('customer_dashboard') }}" class="btn cancel">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Your JavaScript code -->
+    <script>
+        document.getElementById("customerProfileForm").addEventListener("submit", function(event) {
+            // JavaScript validation here
+        });
+    </script>
+</body>
+</html>
