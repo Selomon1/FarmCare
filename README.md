@@ -1,7 +1,7 @@
 ### FarmCare
 #### Introduction
 FarmCare is a web application designed to streamline pharmacy inventory management and customer profiles. It offers features for pharmacies to manage their medication inventory and for customers to create profiles, search for medications, and find pharmacies that carry specific medications.
-![Screenshot](screenshot.png)
+![Screenshot](Screenshot.png)
 #### Features
 
 - View a list of medications
