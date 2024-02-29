@@ -47,7 +47,7 @@ Contributions to FarmCare are welcome! If you would like to contribute, please f
 
 
 #### Licensing
-This project is licensed under the MIT License. See the LICENSE file for details..
+This project is licensed under the [MIT License](./LICENSE). See the LICENSE file for details.
 
 ---
 
